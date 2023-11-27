@@ -77,12 +77,13 @@ defmodule Quantum.NodeSelectorBroadcaster do
   end
 
   @spec check_node(Node.t(), GenServer.server(), Job.t()) :: boolean
-  defp check_node(node, task_supervisor, %{name: job_name}) do
+  defp check_node(node, task_supervisor, %{name: job_name, run_strategy: run_strategy} = job) do
     if running_node?(node, task_supervisor) do
       true
     else
+      node_list = NodeList.nodes(run_strategy, job)
       Logger.error(
-        "Node #{inspect(node)} is not running. Job #{inspect(job_name)} could not be executed."
+        "Node #{inspect(node)} is not running. Current Node #{inspect(node())}. NodeList #{inspect(node_list)}. Job #{inspect(job_name)} could not be executed."
       )
 
       false
